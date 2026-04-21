@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: taskera-db
+    environment:
+      POSTGRES_DB: taskera
+      POSTGRES_USER: taskera_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-taskera_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - taskera-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: taskera-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - taskera-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: taskera-backend
+    environment:
+      DATABASE_URL: postgresql://taskera_user:${DB_PASSWORD:-taskera_password}@postgres:5432/taskera
+      JWT_SECRET: ${JWT_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      FRONTEND_URL: http://localhost:3000
+      NODE_ENV: production
+    ports:
+      - "3020:3020"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - taskera-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: taskera-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3020
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - taskera-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  taskera-network:
+    driver: bridge

@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+/* Vision Theme Styles */
+:root {
+  --theme-primary-gradient: #0ea5e9,#06b6d4;
+  --theme-bg-light: #f0f9ff,#f0fdfa;
+  --theme-bg-dark: #0c4a6e,#164e63;
+  --theme-colors: #0ea5e9,#06b6d4;
+}
+
+/* Theme Classes */
+.theme-ocean-breeze {
+  --theme-primary: #0ea5e9;
+  --theme-secondary: #06b6d4;
+  --theme-accent: #0891b2;
+}
+
+.theme-sunset-glow {
+  --theme-primary: #fb923c;
+  --theme-secondary: #ec4899;
+  --theme-accent: #f97316;
+}
+
+.theme-forest-calm {
+  --theme-primary: #4ade80;
+  --theme-secondary: #10b981;
+  --theme-accent: #059669;
+}
+
+.theme-arctic-frost {
+  --theme-primary: #64748b;
+  --theme-secondary: #0ea5e9;
+  --theme-accent: #0284c7;
+}
+
+.theme-volcanic-fire {
+  --theme-primary: #ef4444;
+  --theme-secondary: #fb923c;
+  --theme-accent: #f97316;
+}
+
+.theme-cosmic-dream {
+  --theme-primary: #a855f7;
+  --theme-secondary: #6366f1;
+  --theme-accent: #8b5cf6;
+}
+
+/* Apply theme to common elements */
+.theme-ocean-breeze .bg-gradient-to-r.from-blue-600.via-indigo-600.to-violet-600,
+.theme-ocean-breeze .bg-gradient-to-r.from-blue-600.via-indigo-600.to-purple-600 {
+  background: linear-gradient(to right, #0ea5e9, #06b6d4, #0891b2) !important;
+}
+
+.theme-sunset-glow .bg-gradient-to-r.from-blue-600.via-indigo-600.to-violet-600,
+.theme-sunset-glow .bg-gradient-to-r.from-blue-600.via-indigo-600.to-purple-600 {
+  background: linear-gradient(to right, #fb923c, #ec4899, #f97316) !important;
+}
+
+.theme-forest-calm .bg-gradient-to-r.from-blue-600.via-indigo-600.to-violet-600,
+.theme-forest-calm .bg-gradient-to-r.from-blue-600.via-indigo-600.to-purple-600 {
+  background: linear-gradient(to right, #4ade80, #10b981, #059669) !important;
+}
+
+.theme-arctic-frost .bg-gradient-to-r.from-blue-600.via-indigo-600.to-violet-600,
+.theme-arctic-frost .bg-gradient-to-r.from-blue-600.via-indigo-600.to-purple-600 {
+  background: linear-gradient(to right, #64748b, #0ea5e9, #0284c7) !important;
+}
+
+.theme-volcanic-fire .bg-gradient-to-r.from-blue-600.via-indigo-600.to-violet-600,
+.theme-volcanic-fire .bg-gradient-to-r.from-blue-600.via-indigo-600.to-purple-600 {
+  background: linear-gradient(to right, #ef4444, #fb923c, #f97316) !important;
+}
+
+.theme-cosmic-dream .bg-gradient-to-r.from-blue-600.via-indigo-600.to-violet-600,
+.theme-cosmic-dream .bg-gradient-to-r.from-blue-600.via-indigo-600.to-purple-600 {
+  background: linear-gradient(to right, #a855f7, #6366f1, #8b5cf6) !important;
+}
+
+/* Theme specific button styles */
+.theme-ocean-breeze button[class*="bg-gradient-to-r"] {
+  background: linear-gradient(to right, #0ea5e9, #06b6d4) !important;
+}
+
+.theme-sunset-glow button[class*="bg-gradient-to-r"] {
+  background: linear-gradient(to right, #fb923c, #ec4899) !important;
+}
+
+.theme-forest-calm button[class*="bg-gradient-to-r"] {
+  background: linear-gradient(to right, #4ade80, #10b981) !important;
+}
+
+.theme-arctic-frost button[class*="bg-gradient-to-r"] {
+  background: linear-gradient(to right, #64748b, #0ea5e9) !important;
+}
+
+.theme-volcanic-fire button[class*="bg-gradient-to-r"] {
+  background: linear-gradient(to right, #ef4444, #fb923c) !important;
+}
+
+.theme-cosmic-dream button[class*="bg-gradient-to-r"] {
+  background: linear-gradient(to right, #a855f7, #6366f1) !important;
+}
+
+/* Theme specific backgrounds */
+.theme-ocean-breeze .bg-gradient-to-br.from-slate-50.via-white.to-slate-100 {
+  background: linear-gradient(to bottom right, #f0f9ff, #ffffff, #e0f2fe) !important;
+}
+
+.theme-sunset-glow .bg-gradient-to-br.from-slate-50.via-white.to-slate-100 {
+  background: linear-gradient(to bottom right, #fff7ed, #ffffff, #fed7aa) !important;
+}
+
+.theme-forest-calm .bg-gradient-to-br.from-slate-50.via-white.to-slate-100 {
+  background: linear-gradient(to bottom right, #f0fdf4, #ffffff, #dcfce7) !important;
+}
+
+.theme-arctic-frost .bg-gradient-to-br.from-slate-50.via-white.to-slate-100 {
+  background: linear-gradient(to bottom right, #f8fafc, #ffffff, #e2e8f0) !important;
+}
+
+.theme-volcanic-fire .bg-gradient-to-br.from-slate-50.via-white.to-slate-100 {
+  background: linear-gradient(to bottom right, #fef2f2, #ffffff, #fee2e2) !important;
+}
+
+.theme-cosmic-dream .bg-gradient-to-br.from-slate-50.via-white.to-slate-100 {
+  background: linear-gradient(to bottom right, #faf5ff, #ffffff, #f3e8ff) !important;
+}
+
+/* Dark mode theme backgrounds */
+.theme-ocean-breeze.dark .bg-gradient-to-br.from-slate-950.via-slate-900.dark:to-slate-950 {
+  background: linear-gradient(to bottom right, #0c4a6e, #164e63, #083344) !important;
+}
+
+.theme-sunset-glow.dark .bg-gradient-to-br.from-slate-950.via-slate-900.dark:to-slate-950 {
+  background: linear-gradient(to bottom right, #7c2d12, #9a3412, #991b1b) !important;
+}
+
+.theme-forest-calm.dark .bg-gradient-to-br.from-slate-950.via-slate-900.dark:to-slate-950 {
+  background: linear-gradient(to bottom right, #14532d, #166534, #052e16) !important;
+}
+
+.theme-arctic-frost.dark .bg-gradient-to-br.from-slate-950.via-slate-900.dark:to-slate-950 {
+  background: linear-gradient(to bottom right, #1e293b, #0c4a6e, #082f49) !important;
+}
+
+.theme-volcanic-fire.dark .bg-gradient-to-br.from-slate-950.via-slate-900.dark:to-slate-950 {
+  background: linear-gradient(to bottom right, #7f1d1d, #991b1b, #450a0a) !important;
+}
+
+.theme-cosmic-dream.dark .bg-gradient-to-br.from-slate-950.via-slate-900.dark:to-slate-950 {
+  background: linear-gradient(to bottom right, #581c87, #4c1d95, #3b0764) !important;
+}
+
+/* Theme transition animation */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
+
+.theme-updated * {
+  transition: none !important;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

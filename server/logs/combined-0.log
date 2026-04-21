@@ -1,0 +1,6 @@
+2026-04-17T23:41:03: 🔌 WebSocket initialized on port 3001
+2026-04-17T23:41:03: 🚀 Server running on port 3001
+2026-04-17T23:41:03: 📊 Environment: development
+2026-04-17T23:41:03: 🌐 Health check: http://localhost:3001/health
+2026-04-18T00:39:15: SIGTERM received, shutting down gracefully
+2026-04-18T00:39:15: Process terminated

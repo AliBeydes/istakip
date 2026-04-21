@@ -1,0 +1,32 @@
+{
+  "name": "is-takip-platform",
+  "version": "1.0.0",
+  "description": "İş Takip ve Kurumsal İşbirliği Platformu",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "start": "./start.sh",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "start:prod": "cd server && npm start",
+    "db:push": "cd server && npx prisma db push",
+    "db:generate": "cd server && npx prisma generate",
+    "db:studio": "cd server && npx prisma studio"
+  },
+  "keywords": [
+    "nextjs",
+    "express",
+    "prisma",
+    "postgresql",
+    "webrtc"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "pm2": "^6.0.14"
+  }
+}

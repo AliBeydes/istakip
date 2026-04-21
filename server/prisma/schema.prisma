@@ -1,0 +1,560 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  password         String
+  firstName        String
+  lastName         String
+  avatar           String?
+  
+  // Professional Profile Fields
+  company          String?   // Şirket adı
+  position         String?   // Görev/Pozisyon
+  department       String?   // Departman
+  employeeId       String?   // Çalışan ID/Sicil
+  bio              String?   // Biyografi/Hakkında
+  skills           String?   // JSON array of skills: ["React", "Node.js", "Project Management"]
+  experience       String?   // Deneyim yılı
+  education        String?   // Eğitim bilgisi
+  location         String?   // Lokasyon/Şehir
+  timezone         String?   @default("Europe/Istanbul")
+  phone            String?
+  linkedinUrl      String?   // LinkedIn profil
+  githubUrl        String?   // GitHub profil
+  website          String?   // Kişisel web sitesi
+  
+  // Badge/Rozet System
+  role             String    @default("MEMBER") // ADMIN, MANAGER, MEMBER, GUEST
+  badges           String?   // JSON array of earned badges
+  level            Int       @default(1)       // Seviye (1-10)
+  reputation       Int       @default(0)       // Puan/saygınlık
+  joinDate         DateTime  @default(now())   // İşe başlama tarihi
+  
+  // Subscription
+  subscription     String?   // free, pro, business
+  subscriptionStatus String? // active, cancelled, past_due
+  subscriptionEndsAt DateTime?
+  
+  // Status
+  isActive         Boolean   @default(true)
+  isOnline         Boolean   @default(false)
+  lastLoginAt      DateTime?
+  emailVerifiedAt  DateTime?
+  emailVerificationToken String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Relations
+  workspaceMembers WorkspaceMember[]
+  ownedWorkspaces  Workspace[]       @relation("WorkspaceOwner")
+  taskAssignments  TaskAssignment[]
+  createdTasks     Task[]            @relation("TaskCreator")
+  taskComments     TaskComment[]     @relation("TaskComments")
+  documents        Document[]        @relation("DocumentCreator")
+  documentShares   DocumentShare[]
+  organizedMeetings Meeting[]       @relation("MeetingOrganizer")
+  meetingAttendees MeetingAttendee[]
+  notifications    Notification[]
+  sentMessages     Message[]         @relation("MessageSender")
+  receivedMessages Message[]         @relation("MessageReceiver")
+  groupMemberships GroupMember[]
+  createdGroups    Group[]           @relation("GroupCreator")
+  timeEntries      TimeEntry[]
+  taskTemplates    TaskTemplate[]
+  automationRules  AutomationRule[]
+  notes            Note[]
+  folders          Folder[]
+  noteShares       NoteShare[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  avatar      String?
+  ownerId     String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  owner    User               @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members  WorkspaceMember[]
+  groups   Group[]
+  tasks    Task[]
+  documents Document[]
+  meetings Meeting[]
+  timeEntries TimeEntry[]
+  taskTemplates TaskTemplate[]
+  automationRules AutomationRule[]
+  customFields CustomField[]
+  notes Note[]
+  analytics Analytics[]
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id         String   @id @default(cuid())
+  userId     String
+  workspaceId String
+  role       String    @default("MEMBER")
+  joinedAt   DateTime @default(now())
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@map("workspace_members")
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  workspaceId String
+  color       String?
+  createdBy   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User?    @relation("GroupCreator", fields: [createdBy], references: [id])
+  members   GroupMember[]
+  tasks     Task[]
+  documents Document[]
+  documentShares DocumentShare[]
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id       String @id @default(cuid())
+  userId   String
+  groupId  String
+  role     String   @default("MEMBER")
+  joinedAt DateTime @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+  @@map("group_members")
+}
+
+model Task {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  status      String    @default("TODO")
+  priority    String    @default("MEDIUM")
+  dueDate     DateTime?
+  workspaceId String
+  groupId     String?
+  creatorId   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  workspace Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  group     Group?          @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  creator   User            @relation("TaskCreator", fields: [creatorId], references: [id])
+  assignees TaskAssignment[]
+  documents TaskDocument[]
+  comments  TaskComment[]
+  tags      TaskTag[]
+  timeEntries TimeEntry[]
+  customFieldValues CustomFieldValue[]
+
+  @@map("tasks")
+  @@index([status, dueDate])
+  @@index([workspaceId, status])
+  @@index([creatorId])
+}
+
+model TaskAssignment {
+  id     String @id @default(cuid())
+  taskId String
+  userId String
+  assignedAt DateTime @default(now())
+
+  // Relations
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@map("task_assignments")
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  content   String
+  taskId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation("TaskComments", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("task_comments")
+}
+
+model TaskTag {
+  id     String @id @default(cuid())
+  taskId String
+  tag    String
+
+  // Relations
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, tag])
+  @@map("task_tags")
+}
+
+model TaskDocument {
+  id        String   @id @default(cuid())
+  taskId    String
+  documentId String
+  addedAt   DateTime @default(now())
+
+  // Relations
+  task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, documentId])
+  @@map("task_documents")
+}
+
+model Document {
+  id          String        @id @default(cuid())
+  title       String
+  content     String?
+  type        String    @default("FILE")
+  filePath    String?
+  fileSize    Int?
+  mimeType    String?
+  workspaceId String
+  creatorId   String
+  visibility  String    @default("PUBLIC") // PUBLIC, PRIVATE, GROUP, SPECIFIC_USERS
+  groupId     String?   // If visibility is GROUP
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  workspace Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User           @relation("DocumentCreator", fields: [creatorId], references: [id])
+  group     Group?         @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  tasks     TaskDocument[]
+  meetingDocuments MeetingDocument[]
+  shares    DocumentShare[]
+
+  @@map("documents")
+  @@index([workspaceId, visibility])
+  @@index([creatorId])
+}
+
+model DocumentShare {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String?
+  groupId    String?
+  permission String   @default("READ") // READ, WRITE, ADMIN
+  createdAt  DateTime @default(now())
+
+  // Relations
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group    Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId, groupId])
+  @@map("document_shares")
+}
+
+model Meeting {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime?
+  type        String        @default("REGULAR") // REGULAR, RECURRING, ONE_ON_ONE
+  status      String        @default("SCHEDULED") // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+  location    String?
+  isOnline    Boolean      @default(false)
+  meetingUrl  String?
+  meetingLink String?
+  workspaceId String
+  organizerId String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  workspace Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  organizer User            @relation("MeetingOrganizer", fields: [organizerId], references: [id])
+  attendees MeetingAttendee[]
+  documents MeetingDocument[]
+  messages  Message[]
+
+  @@map("meetings")
+}
+
+model MeetingAttendee {
+  id        String            @id @default(cuid())
+  meetingId String
+  userId    String
+  status    String    @default("INVITED")
+  joinedAt  DateTime?
+  leftAt    DateTime?
+
+  // Relations
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, userId])
+  @@map("meeting_attendees")
+}
+
+model MeetingDocument {
+  id         String   @id @default(cuid())
+  meetingId  String
+  documentId String
+  addedAt    DateTime @default(now())
+
+  // Relations
+  meeting  Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, documentId])
+  @@map("meeting_documents")
+}
+
+model Message {
+  id         String      @id @default(cuid())
+  content    String
+  type       String    @default("TEXT")
+  senderId   String
+  receiverId String?
+  meetingId  String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  // Relations
+  sender   User    @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User?   @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  meeting  Meeting? @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  title     String
+  content   String
+  type      String    @default("INFO")
+  userId    String
+  isRead    Boolean          @default(false)
+  data      String?  // Additional data for the notification
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// Time Tracking Model
+model TimeEntry {
+  id          String   @id @default(cuid())
+  taskId      String
+  userId      String
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int?     // Duration in minutes
+  description String?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("time_entries")
+}
+
+// Task Template Model
+model TaskTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  defaultTitle String?
+  defaultDescription String?
+  defaultPriority String @default("MEDIUM")
+  defaultStatus String @default("TODO")
+  estimatedHours Int?
+  workspaceId String
+  creatorId   String
+  isActive    Boolean  @default(true)
+  tags        String?  // JSON array of tags
+  checklist   String?  // JSON array of checklist items
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@map("task_templates")
+}
+
+// Automation Rule Model
+model AutomationRule {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  trigger     String   // e.g., "TASK_CREATED", "STATUS_CHANGED", "DUE_DATE_APPROACHING"
+  condition   String?  // JSON condition object
+  action      String   // e.g., "SEND_NOTIFICATION", "UPDATE_STATUS", "ASSIGN_USER"
+  actionData  String?  // JSON action configuration
+  workspaceId String
+  creatorId   String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@map("automation_rules")
+}
+
+// Custom Field Model
+model CustomField {
+  id          String   @id @default(cuid())
+  name        String
+  label       String
+  type        String   // e.g., "TEXT", "NUMBER", "DATE", "SELECT", "CHECKBOX"
+  options     String?  // JSON array for SELECT type options
+  defaultValue String?
+  isRequired  Boolean  @default(false)
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  values    CustomFieldValue[]
+
+  @@map("custom_fields")
+}
+
+// Custom Field Values
+model CustomFieldValue {
+  id          String   @id @default(cuid())
+  fieldId     String
+  taskId      String
+  value       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  field CustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  task  Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([fieldId, taskId])
+  @@map("custom_field_values")
+}
+
+// Notes System
+model Note {
+  id          String   @id @default(cuid())
+  title       String
+  content     String?
+  color       String   @default("default")
+  isPinned    Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  authorId    String
+  workspaceId String
+  folderId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  folder    Folder?    @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  tags      Tag[]
+  shares    NoteShare[]
+
+  @@map("notes")
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  color     String   @default("blue")
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes Note[]
+
+  @@map("folders")
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  notes Note[]
+
+  @@map("tags")
+}
+
+model NoteShare {
+  id        String   @id @default(cuid())
+  noteId    String
+  userId    String
+  canEdit   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, userId])
+  @@map("note_shares")
+}
+
+// Analytics Model
+model Analytics {
+  id          String   @id @default(cuid())
+  workspaceId String
+  date        DateTime @default(now())
+  metric      String   // daily_active_users, tasks_created, messages_sent, documents_uploaded
+  value       Int
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, date, metric])
+  @@map("analytics")
+}
