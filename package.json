@@ -11,6 +11,7 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "cd client && npm run build",
     "build:server": "cd server && npm run build",
+    "build:server-only": "cd server && npm install && npm run build",
     "start:prod": "cd server && npm start",
     "db:push": "cd server && npx prisma db push",
     "db:generate": "cd server && npx prisma generate",
