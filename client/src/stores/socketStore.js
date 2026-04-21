@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { io } from 'socket.io-client';
 import { useAuthStore } from './authStore';
 
-const SOCKET_URL = 'http://localhost:3020';
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3020';
 
 export const useSocketStore = create((set, get) => ({
   // State

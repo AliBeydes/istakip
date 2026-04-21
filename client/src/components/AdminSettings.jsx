@@ -719,7 +719,7 @@ export default function AdminSettings() {
                       const parsed = JSON.parse(authStorage);
                       const token = parsed.state?.user?.token;
                       
-                      const response = await fetch('http://localhost:3020/api/meetings/test-smtp', {
+                      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3020/api'}/meetings/test-smtp`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',

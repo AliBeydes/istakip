@@ -26,7 +26,7 @@ export default function MeetingPage({ params }) {
         }
 
         // Use public endpoint for invite links
-        const response = await fetch(`http://localhost:3020/api/public/meetings/${params.id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3020/api'}/public/meetings/${params.id}`, {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -83,7 +83,7 @@ export default function MeetingPage({ params }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:3020/api/public/meetings/${params.id}/join-guest`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3020/api'}/public/meetings/${params.id}/join-guest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

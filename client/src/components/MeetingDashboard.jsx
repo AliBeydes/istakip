@@ -116,7 +116,7 @@ export default function MeetingDashboard({ workspaceId = '1' }) {
       const token = parsed.state?.user?.token;
       console.log('📧 Token:', token ? 'exists' : 'missing');
       
-      const url = `http://localhost:3020/api/meetings/${meetingId}/invite-external`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3020/api'}/meetings/${meetingId}/invite-external`;
       console.log('📧 API URL:', url);
       
       const response = await axios.post(
